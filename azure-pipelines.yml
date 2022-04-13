@@ -1,34 +1,42 @@
-# Android
-# Build your Android project with Gradle.
-# Add steps that test, sign, and distribute the APK, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/android
-
+---
+trigger:
+- main
 pool:
-  vmImage: 'macOS-10.13'
+  vmImage: macOS-latest
 
-steps:
-- task: Gradle@2
-  inputs:
-    workingDirectory: ''
-    gradleWrapperFile: 'gradlew'
-    gradleOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
-    tasks: 'assembleDebug test'
-  displayName: gradlew assembleDebug test
-
-- task: CopyFiles@2
-  inputs:
-    contents: '**/*.apk'
-    targetFolder: '$(build.artifactStagingDirectory)'
-  displayName: Copy .apk files to artifact staging directory
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    pathToPublish: '$(build.artifactStagingDirectory)'
-    artifactName: 'drop'
-    artifactType: 'container'
-  displayName: Publish artifacts
+jobs:
+- job: build
+  steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '6.x'
+    -  script: npm install
+        npm install -g @angular/cli
+    - script: "npm install -g @ionic/cli@6.18.1\n"
+    - script: "npm i -g cordova\n"
+    - script: "ionic cordova platform add android\n"
+    - script: "ionic cordova plugin add cordova-plugin-androidx-adapter\n"
+    - script: "ionic cordova build android --prod\n"
+    - task: AndroidSigning@3
+      inputs:
+        apkFiles: '**/*.apk'
+        apksignerKeystoreFile: 'keystore-upload.jks'
+        apksignerKeystorePassword: 'Testimportant@443'
+        apksignerKeystoreAlias: 'upload-keystore'
+        apksignerKeyPassword: 'Testimportant@443'
+    - task: CopyFiles@2
+      inputs:
+        CleanTargetFolder: true
+        Contents: "**/*.apk"
+        SourceFolder: $(Agent.BuildDirectory)
+        TargetFolder: $(Build.ArtifactStagingDirectory)
+        flattenFolders: False
+        OverWrite: False
+        preserveTimestamp: False
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'CordovaMobileApps1'
+        publishLocation: 'Container'
+        
+        
