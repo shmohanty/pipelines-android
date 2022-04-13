@@ -10,8 +10,7 @@ jobs:
     - task: NodeTool@0
       inputs:
         versionSpec: '6.x'
-    -  script: npm install
-        npm install -g @angular/cli
+    -  script: "npm install -g @angular/cli"
     - script: "npm install -g @ionic/cli@6.18.1\n"
     - script: "npm i -g cordova\n"
     - script: "ionic cordova platform add android\n"
