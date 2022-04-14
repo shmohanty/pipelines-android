@@ -10,9 +10,11 @@ jobs:
     - task: NodeTool@0
       inputs:
         versionSpec: '16.x'
-    -  script: "npm install -g @angular/cli"
+    - script: "npm install -g @angular/cli"
     - script: "npm install -g @ionic/cli@6.18.1\n"
     - script: "npm i -g cordova\n"
+    - script: "ionic cordova platform add android\n"
+    - script: "ionic cordova plugin add cordova-plugin-androidx-adapter\n"
     
     - task: AndroidSigning@3
       inputs:
