@@ -7,35 +7,15 @@ pool:
 jobs:
 - job: build
   steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '16.x'
-    - script: "npm install -g @angular/cli"
-    - script: "npm install -g @ionic/cli@6.18.1\n"
-    - script: "npm i -g cordova\n"
-    - script: "ionic cordova platform add android\n"
-    - script: "ionic cordova plugin add cordova-plugin-androidx-adapter\n"
+  - task: Gradle@2
+    inputs:
+      workingDirectory: ''
+      gradleWrapperFile: 'gradlew'
+      gradleOptions: '-Xmx3072m'
+      publishJUnitResults: false
+      testResultsFiles: '**/TEST-*.xml'
+      tasks: 'assembleDebug'
+
+        
+        
     
-    - task: AndroidSigning@3
-      inputs:
-        apkFiles: '**/*.apk'
-        apksignerKeystoreFile: 'keystore-upload.jks'
-        apksignerKeystorePassword: 'Testimportant@443'
-        apksignerKeystoreAlias: 'upload-keystore'
-        apksignerKeyPassword: 'Testimportant@443'
-    - task: CopyFiles@2
-      inputs:
-        CleanTargetFolder: true
-        Contents: "**/*.apk"
-        SourceFolder: $(Agent.BuildDirectory)
-        TargetFolder: $(Build.ArtifactStagingDirectory)
-        flattenFolders: False
-        OverWrite: False
-        preserveTimestamp: False
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'CordovaMobileApps1'
-        publishLocation: 'Container'
-        
-        
